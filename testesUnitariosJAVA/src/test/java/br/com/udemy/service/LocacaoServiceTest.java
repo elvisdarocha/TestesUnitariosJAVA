@@ -8,6 +8,7 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
+import org.junit.rules.ExpectedException;
 
 import br.com.udemy.model.Filme;
 import br.com.udemy.model.Locacao;
@@ -17,6 +18,9 @@ public class LocacaoServiceTest {
 
 	@Rule
 	public ErrorCollector error = new ErrorCollector();
+	@Rule
+	public ExpectedException exception = ExpectedException.none();
+	
 	public static LocacaoService service;
 	public static Usuario usuario;
 	public static Filme filme;
@@ -29,7 +33,7 @@ public class LocacaoServiceTest {
 	}
 
 	@Test
-	public void testeLocacao() {
+	public void testeLocacao() throws Exception {
 		// cenario
 		/* - configurado no setup
 		 service = new LocacaoService();
@@ -60,5 +64,35 @@ public class LocacaoServiceTest {
 		error.checkThat(locacao.getDataLocacao(), CoreMatchers.is(LocalDate.now()));
 		error.checkThat(locacao.getDataRetorno(), CoreMatchers.is(LocalDate.now().plusDays(1)));
 
+	}
+	
+	//Testa Lancar excecao quando filme nao tem estoque
+	//Caso de exception, o teste passa pois é esperado ( expected ) um exception
+	@Test(expected=Exception.class)
+	public void testLocacao_filmeSemEstoque() throws Exception{
+		filme = new Filme("Filme 1", 0, 5.0);
+		service.alugarFilme(usuario, filme);
+	}
+	
+	@Test
+	public void testLocacao_filmeSemEstoque_2() {
+		filme = new Filme("Filme 1", 0, 5.0);
+		try {
+			service.alugarFilme(usuario, filme);
+			//Trava para que nao passe o false positivo
+			Assert.fail("Deveria ter lancado uma excecao");
+		} catch (Exception e) {
+			Assert.assertThat(e.getMessage(), CoreMatchers.is("Filme sem estoque"));
+		}
+	}
+	
+	@Test
+	public void testLocacao_filmeSemEstoque_3() throws Exception{
+		exception.expect(Exception.class);
+		exception.expectMessage("Filme sem estoque");
+		
+		filme = new Filme("Filme 1", 0, 5.0);
+		service.alugarFilme(usuario, filme);
+		
 	}
 }
