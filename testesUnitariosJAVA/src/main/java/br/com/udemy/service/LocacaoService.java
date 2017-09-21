@@ -2,7 +2,6 @@ package br.com.udemy.service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.DoubleStream;
 
 import br.com.udemy.exception.FilmeSemEstoqueException;
 import br.com.udemy.exception.LocadoraException;
@@ -26,13 +25,30 @@ public class LocacaoService {
 			}
 		}
 		
-		
-		
 		Locacao locacao = new Locacao();
 		locacao.setFilmes(filmes);
 		locacao.setUsuario(usuario);
 		locacao.setDataLocacao(LocalDate.now());
-		Double somaLocacao = filmes.stream().flatMapToDouble(f -> DoubleStream.of(f.getPrecoLocacao())).sum();
+		Double somaLocacao = 0d;
+		
+		for(int i = 0; i < filmes.size(); i++) {
+			Filme filme = filmes.get(i);
+			Double valorFilme = filme.getPrecoLocacao();
+			if(i  == 2) {
+				valorFilme =  valorFilme * 0.75;
+			}
+			if(i  == 3) {
+				valorFilme =  valorFilme * 0.5;
+			}
+			if(i  == 4) {
+				valorFilme =  valorFilme * 0.25;
+			}
+			if(i  == 5) {
+				valorFilme =  0d;
+			}
+			somaLocacao += valorFilme;
+		}
+		//filmes.stream().flatMapToDouble(f -> DoubleStream.of(f.getPrecoLocacao())).sum();
 		locacao.setValor(somaLocacao);
 		
 		//Entrega no dia seguinte
