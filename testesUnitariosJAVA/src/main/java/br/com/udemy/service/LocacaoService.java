@@ -1,5 +1,6 @@
 package br.com.udemy.service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -34,8 +35,16 @@ public class LocacaoService {
 		for(int i = 0; i < filmes.size(); i++) {
 			Filme filme = filmes.get(i);
 			Double valorFilme = filme.getPrecoLocacao();
-			if(i  == 2) {
-				valorFilme =  valorFilme * 0.75;
+			
+			switch (i) {
+				case 2: valorFilme =  valorFilme * 0.75; break;
+				case 3: valorFilme =  valorFilme * 0.5; break;
+				case 4: valorFilme =  valorFilme * 0.25; break;
+				case 5: valorFilme =  0d; break;
+			}
+			
+			/*if(i  == 2) {
+			valorFilme =  valorFilme * 0.75;
 			}
 			if(i  == 3) {
 				valorFilme =  valorFilme * 0.5;
@@ -45,7 +54,8 @@ public class LocacaoService {
 			}
 			if(i  == 5) {
 				valorFilme =  0d;
-			}
+			}*/
+			
 			somaLocacao += valorFilme;
 		}
 		//filmes.stream().flatMapToDouble(f -> DoubleStream.of(f.getPrecoLocacao())).sum();
@@ -54,6 +64,8 @@ public class LocacaoService {
 		//Entrega no dia seguinte
 		LocalDate dataEntrega = LocalDate.now();
 		dataEntrega = dataEntrega.plusDays(1);
+		if(DayOfWeek.from(dataEntrega).equals(DayOfWeek.SUNDAY))
+			dataEntrega = dataEntrega.plusDays(1);
 		locacao.setDataRetorno(dataEntrega);
 		
 		return locacao;

@@ -1,5 +1,10 @@
 package br.com.udemy.service;
 
+import static br.com.udemy.matchers.MatchersProprios.caiNumaSegunda;
+import static br.com.udemy.matchers.MatchersProprios.ehHoje;
+import static br.com.udemy.matchers.MatchersProprios.ehHojeComDiferencaDias;
+
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,8 +13,10 @@ import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
@@ -17,6 +24,8 @@ import org.junit.rules.ExpectedException;
 
 import br.com.udemy.exception.FilmeSemEstoqueException;
 import br.com.udemy.exception.LocadoraException;
+import br.com.udemy.matchers.DiaSemanaMatcher;
+import br.com.udemy.matchers.MatchersProprios;
 import br.com.udemy.model.Filme;
 import br.com.udemy.model.Locacao;
 import br.com.udemy.model.Usuario;
@@ -35,7 +44,7 @@ public class LocacaoServiceTest {
 	@BeforeClass
 	public static void setUpClass() {
 		service = new LocacaoService();
-		usuario = new Usuario("usuario 1");
+		usuario = new Usuario("Usuario 1");
 	}
 	
 	@Before
@@ -56,6 +65,9 @@ public class LocacaoServiceTest {
 
 	@Test
 	public void deveAlugarFilme() throws Exception {
+		
+		Assume.assumeFalse(DayOfWeek.from(LocalDate.now()).equals(DayOfWeek.SATURDAY));
+		
 		// cenario
 		/* - configurado no setup
 		 service = new LocacaoService();
@@ -87,6 +99,9 @@ public class LocacaoServiceTest {
 		error.checkThat(locacao.getDataLocacao(), CoreMatchers.is(LocalDate.now()));
 		error.checkThat(locacao.getDataRetorno(), CoreMatchers.is(LocalDate.now().plusDays(1)));
 
+		
+		error.checkThat(locacao.getDataRetorno(), ehHojeComDiferencaDias(1L));
+		error.checkThat(locacao.getDataLocacao(), ehHoje());
 	}
 	
 	//Testa Lancar excecao quando filme nao tem estoque
@@ -144,7 +159,6 @@ public class LocacaoServiceTest {
 	@Test
 	public void devePagar75PorcentoNoFilme3() throws LocadoraException, FilmeSemEstoqueException {
 		//cenario
-		Usuario usuario = new Usuario("Usuario 1");
 		filmes.add(new Filme("Filme 1", 2, 4.0));
 		filmes.add(new Filme("Filme 2", 2, 4.0));
 		filmes.add(new Filme("Filme 3", 2, 4.0));
@@ -160,7 +174,6 @@ public class LocacaoServiceTest {
 	@Test
 	public void devePagar50PorcentoNoFilme4() throws LocadoraException, FilmeSemEstoqueException {
 		//cenario
-		Usuario usuario = new Usuario("Usuario 1");
 		filmes.add(new Filme("Filme 1", 2, 4.0));
 		filmes.add(new Filme("Filme 2", 2, 4.0));
 		filmes.add(new Filme("Filme 3", 2, 4.0));
@@ -177,7 +190,6 @@ public class LocacaoServiceTest {
 	@Test
 	public void devePagar25PorcentoNoFilme5() throws LocadoraException, FilmeSemEstoqueException {
 		//cenario
-		Usuario usuario = new Usuario("Usuario 1");
 		filmes.add(new Filme("Filme 1", 2, 4.0));
 		filmes.add(new Filme("Filme 2", 2, 4.0));
 		filmes.add(new Filme("Filme 3", 2, 4.0));
@@ -193,9 +205,8 @@ public class LocacaoServiceTest {
 	}
 	
 	@Test
-	public void devePagar0PorcentoNoFilme6() throws LocadoraException, FilmeSemEstoqueException {
+	public void deveAlugarDeGracaOFilme6() throws LocadoraException, FilmeSemEstoqueException {
 		//cenario
-		Usuario usuario = new Usuario("Usuario 1");
 		filmes.add(new Filme("Filme 1", 2, 4.0));
 		filmes.add(new Filme("Filme 2", 2, 4.0));
 		filmes.add(new Filme("Filme 3", 2, 4.0));
@@ -211,4 +222,41 @@ public class LocacaoServiceTest {
 		Assert.assertThat(resultado.getValor(), CoreMatchers.is(14.0));
 	}
 	
+	@Test
+	public void deveDevolverNaSegundaAoAlugarNoSabado() throws LocadoraException, FilmeSemEstoqueException {
+		//cenario
+		Assume.assumeTrue(DayOfWeek.from(LocalDate.now()).equals(DayOfWeek.SATURDAY));
+		
+		filmes.add(new Filme("Filme 1", 1, 5.0));
+		
+		//acao
+		
+		Locacao retorno = service.alugarFilme(usuario, filmes);
+		
+		
+		boolean retornoNaSegunda = DayOfWeek.from(retorno.getDataRetorno()).equals(DayOfWeek.MONDAY);
+		
+		//verificacao
+		Assert.assertTrue(retornoNaSegunda);
+	}
+	
+	@Test
+	public void deveDevolverNaSegundaAoAlugarNoSabado_UtilizandoMatcherProprio() throws LocadoraException, FilmeSemEstoqueException {
+		//cenario
+		Assume.assumeTrue(DayOfWeek.from(LocalDate.now()).equals(DayOfWeek.SATURDAY));
+		
+		filmes.add(new Filme("Filme 1", 1, 5.0));
+		
+		//acao
+		Locacao retorno = service.alugarFilme(usuario, filmes);
+		
+		//verificacao
+		boolean retornoNaSegunda = DayOfWeek.from(retorno.getDataRetorno()).equals(DayOfWeek.MONDAY);
+		Assert.assertTrue(retornoNaSegunda);
+		
+		Assert.assertThat(retorno.getDataRetorno(), MatchersProprios.caiEm(DayOfWeek.MONDAY));
+		
+		Assert.assertThat(retorno.getDataRetorno(), caiNumaSegunda());
+		
+	}
 }
