@@ -22,6 +22,8 @@ import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
 
+import br.com.udemy.builders.FilmeBuilder;
+import br.com.udemy.builders.UsuarioBuilder;
 import br.com.udemy.exception.FilmeSemEstoqueException;
 import br.com.udemy.exception.LocadoraException;
 import br.com.udemy.matchers.DiaSemanaMatcher;
@@ -29,6 +31,7 @@ import br.com.udemy.matchers.MatchersProprios;
 import br.com.udemy.model.Filme;
 import br.com.udemy.model.Locacao;
 import br.com.udemy.model.Usuario;
+import buildermaster.BuilderMaster;
 
 public class LocacaoServiceTest {
 
@@ -44,7 +47,7 @@ public class LocacaoServiceTest {
 	@BeforeClass
 	public static void setUpClass() {
 		service = new LocacaoService();
-		usuario = new Usuario("Usuario 1");
+		usuario = UsuarioBuilder.criarComUmUsuario().pegarUsuarioAtual();
 	}
 	
 	@Before
@@ -76,7 +79,7 @@ public class LocacaoServiceTest {
 		 */
 
 		// acao
-		filmes.add(new Filme("Filme 1", 2, 5.0));
+		filmes.add(FilmeBuilder.umFilme().comValor(5.0).agora());
 		Locacao locacao = service.alugarFilme(usuario, filmes);
 
 		// verificacao
@@ -108,13 +111,13 @@ public class LocacaoServiceTest {
 	//Caso de exception, o teste passa pois é esperado ( expected ) um exception
 	@Test(expected=FilmeSemEstoqueException.class)
 	public void deveLancarExcecaoAoAlugarFilmeSemEstoque() throws Exception{
-		filmes.add(new Filme("Filme 1", 0, 5.0));
+		filmes.add(FilmeBuilder.umFilmeSemEstoque().agora());
 		service.alugarFilme(usuario, filmes);
 	}
 	
 	@Test
 	public void naoDeveAlugarFilmeSemEstoque() {
-		filmes.add(new Filme("Filme 1", 0, 5.0));
+		filmes.add(FilmeBuilder.umFilme().semEstoque().agora());
 		try {
 			service.alugarFilme(usuario, filmes);
 			//Trava para que nao passe o false positivo
@@ -129,7 +132,7 @@ public class LocacaoServiceTest {
 		exception.expect(Exception.class);
 		exception.expectMessage("Filme sem estoque");
 		
-		filmes.add(new Filme("Filme 1", 0, 5.0));
+		filmes.add(FilmeBuilder.umFilme().semEstoque().agora());
 		service.alugarFilme(usuario, filmes);
 		
 		//Apos lancada a execao, o junit para de executar o metodo
@@ -159,7 +162,7 @@ public class LocacaoServiceTest {
 	@Test
 	public void devePagar75PorcentoNoFilme3() throws LocadoraException, FilmeSemEstoqueException {
 		//cenario
-		filmes.add(new Filme("Filme 1", 2, 4.0));
+		filmes.add(FilmeBuilder.umFilme().agora());
 		filmes.add(new Filme("Filme 2", 2, 4.0));
 		filmes.add(new Filme("Filme 3", 2, 4.0));
 		
@@ -174,7 +177,7 @@ public class LocacaoServiceTest {
 	@Test
 	public void devePagar50PorcentoNoFilme4() throws LocadoraException, FilmeSemEstoqueException {
 		//cenario
-		filmes.add(new Filme("Filme 1", 2, 4.0));
+		filmes.add(FilmeBuilder.umFilme().agora());
 		filmes.add(new Filme("Filme 2", 2, 4.0));
 		filmes.add(new Filme("Filme 3", 2, 4.0));
 		filmes.add(new Filme("Filme 4", 2, 4.0));
@@ -190,7 +193,7 @@ public class LocacaoServiceTest {
 	@Test
 	public void devePagar25PorcentoNoFilme5() throws LocadoraException, FilmeSemEstoqueException {
 		//cenario
-		filmes.add(new Filme("Filme 1", 2, 4.0));
+		filmes.add(FilmeBuilder.umFilme().agora());
 		filmes.add(new Filme("Filme 2", 2, 4.0));
 		filmes.add(new Filme("Filme 3", 2, 4.0));
 		filmes.add(new Filme("Filme 4", 2, 4.0));
@@ -207,7 +210,7 @@ public class LocacaoServiceTest {
 	@Test
 	public void deveAlugarDeGracaOFilme6() throws LocadoraException, FilmeSemEstoqueException {
 		//cenario
-		filmes.add(new Filme("Filme 1", 2, 4.0));
+		filmes.add(FilmeBuilder.umFilme().agora());
 		filmes.add(new Filme("Filme 2", 2, 4.0));
 		filmes.add(new Filme("Filme 3", 2, 4.0));
 		filmes.add(new Filme("Filme 4", 2, 4.0));
@@ -227,7 +230,7 @@ public class LocacaoServiceTest {
 		//cenario
 		Assume.assumeTrue(DayOfWeek.from(LocalDate.now()).equals(DayOfWeek.SATURDAY));
 		
-		filmes.add(new Filme("Filme 1", 1, 5.0));
+		filmes.add(FilmeBuilder.umFilme().agora());
 		
 		//acao
 		
@@ -245,7 +248,7 @@ public class LocacaoServiceTest {
 		//cenario
 		Assume.assumeTrue(DayOfWeek.from(LocalDate.now()).equals(DayOfWeek.SATURDAY));
 		
-		filmes.add(new Filme("Filme 1", 1, 5.0));
+		filmes.add(FilmeBuilder.umFilme().agora());
 		
 		//acao
 		Locacao retorno = service.alugarFilme(usuario, filmes);
@@ -258,5 +261,9 @@ public class LocacaoServiceTest {
 		
 		Assert.assertThat(retorno.getDataRetorno(), caiNumaSegunda());
 		
+	}
+	
+	public static void main(String[] args) {
+		new BuilderMaster().gerarCodigoClasse(Locacao.class);
 	}
 }

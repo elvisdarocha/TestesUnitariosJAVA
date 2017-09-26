@@ -13,6 +13,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
+import br.com.udemy.builders.UsuarioBuilder;
 import br.com.udemy.exception.FilmeSemEstoqueException;
 import br.com.udemy.exception.LocadoraException;
 import br.com.udemy.model.Filme;
@@ -37,7 +38,7 @@ public class CalculoValorLocacaoTeste {
 	
 	@Before
 	public void setUpClass() {
-		usuario = new Usuario("Usuario 1");
+		usuario = UsuarioBuilder.criarComUmUsuario().pegarUsuarioAtual();
 		service = new LocacaoService();
 	}
 	
