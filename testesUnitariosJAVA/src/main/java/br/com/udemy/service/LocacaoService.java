@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import br.com.udemy.dao.LocacaoDAO;
-import br.com.udemy.dao.LocacaoDAOFake;
 import br.com.udemy.exception.FilmeSemEstoqueException;
 import br.com.udemy.exception.LocadoraException;
 import br.com.udemy.model.Filme;
@@ -32,7 +31,15 @@ public class LocacaoService {
 			}
 		}
 		
-		if(spcService.possuiNegativacao(usuario)) {
+		boolean possuiNegaticao;
+		
+		try {
+			possuiNegaticao = spcService.possuiNegativacao(usuario);
+		} catch (Exception e) {
+			throw new LocadoraException("Problemas com SPC");
+		}
+		
+		if(possuiNegaticao) {
 			throw new LocadoraException("Usuario negativado");
 		}
 		
@@ -86,11 +93,12 @@ public class LocacaoService {
 	public void notificarAtrasos() {
 		List<Locacao> locacoes = dao.obterLocacoesPendentes();
 		for (Locacao locacao : locacoes) {
-			emailService.notificarAtraso(locacao.getUsuario());
+			if(locacao.getDataLocacao().isBefore(LocalDate.now()))
+				emailService.notificarAtraso(locacao.getUsuario());
 		}
 	}
 	
-	public void setLocacaoDAO(LocacaoDAO dao) {
+	/*public void setLocacaoDAO(LocacaoDAO dao) {
 		this.dao = dao;
 	}
 	
@@ -100,5 +108,5 @@ public class LocacaoService {
 	
 	public void setEmailService(EmailService emailService) {
 		this.emailService = emailService;
-	}
+	}*/
 }
