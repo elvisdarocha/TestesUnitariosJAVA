@@ -12,8 +12,10 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
+import org.mockito.Mockito;
 
 import br.com.udemy.builders.UsuarioBuilder;
+import br.com.udemy.dao.LocacaoDAO;
 import br.com.udemy.exception.FilmeSemEstoqueException;
 import br.com.udemy.exception.LocadoraException;
 import br.com.udemy.model.Filme;
@@ -22,6 +24,9 @@ import br.com.udemy.model.Usuario;
 
 @RunWith(Parameterized.class)
 public class CalculoValorLocacaoTeste {
+	
+	private SPCService spc;
+	private LocacaoDAO dao;
 	
 	@Parameter(value=0)
 	public List<Filme> filmes;
@@ -38,8 +43,13 @@ public class CalculoValorLocacaoTeste {
 	
 	@Before
 	public void setUpClass() {
-		usuario = UsuarioBuilder.criarComUmUsuario().pegarUsuarioAtual();
+		usuario = UsuarioBuilder.umUsuario().agora();
 		service = new LocacaoService();
+		//LocacaoDAO dao = new LocacaoDAOFake();
+		dao = Mockito.mock(LocacaoDAO.class);
+		service.setLocacaoDAO(dao);
+		spc = Mockito.mock(SPCService.class);
+		service.setSPCService(spc);
 	}
 	
 	private static Filme filme1 = new Filme("Filme 1", 2, 4.0);

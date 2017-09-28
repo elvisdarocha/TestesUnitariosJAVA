@@ -7,6 +7,7 @@ import static br.com.udemy.matchers.MatchersProprios.ehHojeComDiferencaDias;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.hamcrest.CoreMatchers;
@@ -16,17 +17,18 @@ import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
+import org.mockito.Mockito;
 
 import br.com.udemy.builders.FilmeBuilder;
+import br.com.udemy.builders.LocacaoBuilder;
 import br.com.udemy.builders.UsuarioBuilder;
+import br.com.udemy.dao.LocacaoDAO;
 import br.com.udemy.exception.FilmeSemEstoqueException;
 import br.com.udemy.exception.LocadoraException;
-import br.com.udemy.matchers.DiaSemanaMatcher;
 import br.com.udemy.matchers.MatchersProprios;
 import br.com.udemy.model.Filme;
 import br.com.udemy.model.Locacao;
@@ -42,17 +44,26 @@ public class LocacaoServiceTest {
 	
 	public static LocacaoService service;
 	public static Usuario usuario;
-	public List<Filme> filmes = new ArrayList<>();
+	public List<Filme> filmes;
+	private SPCService spc;
+	private LocacaoDAO dao;
+	private EmailService emailService;
 
 	@BeforeClass
 	public static void setUpClass() {
-		service = new LocacaoService();
-		usuario = UsuarioBuilder.criarComUmUsuario().pegarUsuarioAtual();
+		usuario = UsuarioBuilder.umUsuario().agora();
 	}
 	
 	@Before
 	public void setUp() {
-		//System.out.println("setup");
+		filmes = new ArrayList<>();
+		service = new LocacaoService();
+		dao = Mockito.mock(LocacaoDAO.class);
+		service.setLocacaoDAO(dao);
+		spc = Mockito.mock(SPCService.class);
+		service.setSPCService(spc);
+		emailService = Mockito.mock(EmailService.class);
+		service.setEmailService(emailService);
 	}
 	
 	@After
@@ -265,5 +276,35 @@ public class LocacaoServiceTest {
 	
 	public static void main(String[] args) {
 		new BuilderMaster().gerarCodigoClasse(Locacao.class);
+	}
+	
+	@Test
+	public void naoDeveAlugarFilmeParaNegativadoSPC() throws LocadoraException, FilmeSemEstoqueException {
+		exception.expect(LocadoraException.class);
+		exception.expectMessage("Usuario negativado");
+		
+		Usuario usuario2 = UsuarioBuilder.umUsuario().agora();
+		//O mockito retorna true, mesmo passando outro usuario
+		//pq ele invoca o metodo equals quando utilizado o when
+		Mockito.when(spc.possuiNegativacao(usuario2)).thenReturn(true);
+		
+		usuario = UsuarioBuilder.umUsuario().agora();
+		filmes.add(FilmeBuilder.umFilme().agora());
+		
+		service.alugarFilme(usuario, filmes);
+		
+		
+	}
+	
+	@Test
+	public void deveEnviarEmailParaLocacoesAtrasadas() {
+		LocalDate anteontem = LocalDate.now().minusDays(2);
+		List<Locacao> locacoes = Arrays.asList(LocacaoBuilder.umLocacao().comDataRetorno(anteontem).agora());
+		
+		Mockito.when(dao.obterLocacoesPendentes()).thenReturn(locacoes);
+		
+		service.notificarAtrasos();
+		
+		Mockito.verify(emailService).notificarAtraso(usuario);
 	}
 }

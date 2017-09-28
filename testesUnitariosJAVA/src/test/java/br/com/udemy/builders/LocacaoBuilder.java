@@ -24,7 +24,7 @@ public class LocacaoBuilder {
 		Locacao elemento = builder.elemento;
 
 		
-		elemento.setUsuario(UsuarioBuilder.criarComUmUsuario().pegarUsuarioAtual());
+		elemento.setUsuario(UsuarioBuilder.umUsuario().agora());
 		elemento.setFilmes(Arrays.asList(FilmeBuilder.umFilme().agora()));
 		elemento.setDataLocacao(LocalDate.now());
 		elemento.setDataRetorno(LocalDate.now().plusDays(1L));

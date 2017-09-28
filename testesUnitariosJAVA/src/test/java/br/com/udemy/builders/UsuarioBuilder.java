@@ -8,13 +8,18 @@ public class UsuarioBuilder {
 	
 	private UsuarioBuilder() {}
 	
-	public static UsuarioBuilder criarComUmUsuario() {
+	public static UsuarioBuilder umUsuario() {
 		UsuarioBuilder builder = new UsuarioBuilder();
 		builder.usuario = new Usuario("Usuario 1");
 		return builder;
 	}
 	
-	public Usuario pegarUsuarioAtual() {
+	public UsuarioBuilder comNome(String nome) {
+		usuario.setNome(nome);
+		return this;
+	}
+	
+	public Usuario agora() {
 		return usuario;
 	}
 }
