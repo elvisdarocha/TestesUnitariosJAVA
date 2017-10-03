@@ -1,6 +1,5 @@
 package br.com.udemy.service;
 
-import static br.com.udemy.matchers.MatchersProprios.caiNumaSegunda;
 import static br.com.udemy.matchers.MatchersProprios.ehHoje;
 import static br.com.udemy.matchers.MatchersProprios.ehHojeComDiferencaDias;
 
@@ -21,6 +20,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -265,26 +265,6 @@ public class LocacaoServiceTest {
 		Assert.assertTrue(retornoNaSegunda);
 	}
 	
-	@Test
-	public void deveDevolverNaSegundaAoAlugarNoSabado_UtilizandoMatcherProprio() throws LocadoraException, FilmeSemEstoqueException {
-		//cenario
-		Assume.assumeTrue(DayOfWeek.from(LocalDate.now()).equals(DayOfWeek.SATURDAY));
-		
-		filmes.add(FilmeBuilder.umFilme().agora());
-		
-		//acao
-		Locacao retorno = service.alugarFilme(usuario, filmes);
-		
-		//verificacao
-		boolean retornoNaSegunda = DayOfWeek.from(retorno.getDataRetorno()).equals(DayOfWeek.MONDAY);
-		Assert.assertTrue(retornoNaSegunda);
-		
-		Assert.assertThat(retorno.getDataRetorno(), MatchersProprios.caiEm(DayOfWeek.MONDAY));
-		
-		Assert.assertThat(retorno.getDataRetorno(), caiNumaSegunda());
-		
-	}
-	
 	public static void main(String[] args) {
 		new BuilderMaster().gerarCodigoClasse(Locacao.class);
 	}
@@ -294,6 +274,7 @@ public class LocacaoServiceTest {
 		//exception.expect(LocadoraException.class);
 		//exception.expectMessage("Usuario negativado");
 		
+		@SuppressWarnings("unused")
 		Usuario usuario2 = UsuarioBuilder.umUsuario().agora();
 		//O mockito retorna true, mesmo passando outro usuario
 		//pq ele invoca o metodo equals quando utilizado o when
@@ -352,5 +333,22 @@ public class LocacaoServiceTest {
 		
 		//verificacao
 		service.alugarFilme(usuario, filmes);
+	}
+	
+	@Test
+	public void deveProrrogarUmaLocacao() {
+		Locacao locacao = LocacaoBuilder.umLocacao().agora();
+		
+		service.prorrogarLocacao(locacao, 3);
+		
+		ArgumentCaptor<Locacao> argCapt = ArgumentCaptor.forClass(Locacao.class);
+		Mockito.verify(dao).salvar(argCapt.capture());
+		
+		Locacao locacaoRetornada = argCapt.getValue();
+		
+		error.checkThat(locacaoRetornada.getValor(), CoreMatchers.is(12.0));
+		error.checkThat(locacaoRetornada.getDataRetorno(), CoreMatchers.is(LocalDate.now().plusDays(3)));
+		error.checkThat(locacaoRetornada.getDataRetorno(), MatchersProprios.ehHojeComDiferencaDias(3L));
+		
 	}
 }
