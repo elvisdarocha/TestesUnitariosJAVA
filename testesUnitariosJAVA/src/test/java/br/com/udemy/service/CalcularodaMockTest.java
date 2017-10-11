@@ -10,10 +10,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 
-import br.com.udemy.builders.UsuarioBuilder;
-
-
-public class CalcularodaMockTeste {
+public class CalcularodaMockTest {
 	
 	@Mock
 	private Calculadora calcMock;
@@ -21,7 +18,7 @@ public class CalcularodaMockTeste {
 	@Spy
 	private Calculadora calcSpy;
 	
-	@Spy
+	@Mock
 	private EmailService email;
 	
 	@Before
@@ -40,7 +37,7 @@ public class CalcularodaMockTeste {
 		/*Quando utilizado o spy, o metodo é executado quando chamado o when, imprindo no console*/
 		Mockito.when(calcSpy.somar(1, 3)).thenReturn(5);
 		//Para nao executar o codigo do metodo, utilizar o do return
-		Mockito.doReturn(5).when(calcSpy.somar(1, 3));
+		//Mockito.doReturn(5).when(calcSpy.somar(1, 3));
 		
 		System.out.println("Mock:" + calcMock.somar(1, 3));
 		System.out.println("Spy:" + calcSpy.somar(1, 3));

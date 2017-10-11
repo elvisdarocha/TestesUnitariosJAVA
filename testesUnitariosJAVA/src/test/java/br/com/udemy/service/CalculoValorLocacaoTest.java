@@ -14,7 +14,6 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import br.com.udemy.builders.UsuarioBuilder;
@@ -26,7 +25,7 @@ import br.com.udemy.model.Locacao;
 import br.com.udemy.model.Usuario;
 
 @RunWith(Parameterized.class)
-public class CalculoValorLocacaoTeste {
+public class CalculoValorLocacaoTest {
 	
 	@InjectMocks
 	public static LocacaoService service;

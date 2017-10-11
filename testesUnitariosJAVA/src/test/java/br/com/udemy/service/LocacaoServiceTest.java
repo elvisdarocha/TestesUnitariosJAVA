@@ -46,8 +46,8 @@ public class LocacaoServiceTest {
 	public ExpectedException exception = ExpectedException.none();
 	
 	@InjectMocks
-	public static LocacaoService service;
-	public static Usuario usuario;
+	public LocacaoService service;
+	public Usuario usuario;
 	public List<Filme> filmes;
 	
 	@Mock
@@ -59,12 +59,12 @@ public class LocacaoServiceTest {
 
 	@BeforeClass
 	public static void setUpClass() {
-		usuario = UsuarioBuilder.umUsuario().agora();
+		//
 	}
 	
 	@Before
 	public void setUp() {
-		filmes = new ArrayList<>();
+		usuario = UsuarioBuilder.umUsuario().agora();		filmes = new ArrayList<>();
 		
 		MockitoAnnotations.initMocks(this);
 		

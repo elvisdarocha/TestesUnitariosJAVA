@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import br.com.udemy.exception.NaoPodeDividirPorZeroException;
 
-public class CalculadoraTeste {
+public class CalculadoraTest {
 	
 	private Calculadora calc;
 	

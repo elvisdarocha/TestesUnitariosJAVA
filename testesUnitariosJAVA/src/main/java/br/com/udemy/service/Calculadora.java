@@ -27,7 +27,7 @@ public class Calculadora {
 		System.out.println("Passei aqui");
 	}
 
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 		new Calculadora().divide("5", "0");
-	}
+	}*/
 }

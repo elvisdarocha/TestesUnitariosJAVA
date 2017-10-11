@@ -48,7 +48,28 @@ public class LocacaoService {
 		Locacao locacao = new Locacao();
 		locacao.setFilmes(filmes);
 		locacao.setUsuario(usuario);
-		locacao.setDataLocacao(LocalDate.now());
+		locacao.setDataLocacao(obterDataAgora());
+		Double somaLocacao = calcularValorLocacao(filmes);
+		//filmes.stream().flatMapToDouble(f -> DoubleStream.of(f.getPrecoLocacao())).sum();
+		locacao.setValor(somaLocacao);
+		
+		//Entrega no dia seguinte
+		LocalDate dataEntrega = obterDataAgora();
+		dataEntrega = dataEntrega.plusDays(1);
+		if(DayOfWeek.from(dataEntrega).equals(DayOfWeek.SUNDAY))
+			dataEntrega = dataEntrega.plusDays(1);
+		locacao.setDataRetorno(dataEntrega);
+		
+		dao.salvar(locacao);
+		
+		return locacao;
+	}
+
+	protected LocalDate obterDataAgora() {
+		return LocalDate.now();
+	}
+
+	private Double calcularValorLocacao(List<Filme> filmes) {
 		Double somaLocacao = 0d;
 		
 		for(int i = 0; i < filmes.size(); i++) {
@@ -77,25 +98,13 @@ public class LocacaoService {
 			
 			somaLocacao += valorFilme;
 		}
-		//filmes.stream().flatMapToDouble(f -> DoubleStream.of(f.getPrecoLocacao())).sum();
-		locacao.setValor(somaLocacao);
-		
-		//Entrega no dia seguinte
-		LocalDate dataEntrega = LocalDate.now();
-		dataEntrega = dataEntrega.plusDays(1);
-		if(DayOfWeek.from(dataEntrega).equals(DayOfWeek.SUNDAY))
-			dataEntrega = dataEntrega.plusDays(1);
-		locacao.setDataRetorno(dataEntrega);
-		
-		dao.salvar(locacao);
-		
-		return locacao;
+		return somaLocacao;
 	}
 	
 	public void notificarAtrasos() {
 		List<Locacao> locacoes = dao.obterLocacoesPendentes();
 		for (Locacao locacao : locacoes) {
-			if(locacao.getDataLocacao().isBefore(LocalDate.now()))
+			if(locacao.getDataLocacao().isBefore(obterDataAgora()))
 				emailService.notificarAtraso(locacao.getUsuario());
 		}
 	}
@@ -104,8 +113,8 @@ public class LocacaoService {
 		Locacao novaLocacao = new Locacao();
 		novaLocacao.setUsuario(locacao.getUsuario());
 		novaLocacao.setFilmes(locacao.getFilmes());
-		novaLocacao.setDataLocacao(LocalDate.now());
-		novaLocacao.setDataRetorno(LocalDate.now().plusDays(dias));
+		novaLocacao.setDataLocacao(obterDataAgora());
+		novaLocacao.setDataRetorno(obterDataAgora().plusDays(dias));
 		novaLocacao.setValor(locacao.getValor() * dias);
 		dao.salvar(novaLocacao);
 	}
