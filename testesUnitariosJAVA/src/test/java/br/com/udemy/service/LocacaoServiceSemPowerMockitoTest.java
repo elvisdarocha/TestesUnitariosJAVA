@@ -13,7 +13,6 @@ import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
@@ -23,8 +22,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.reflect.Whitebox;
 
 import br.com.udemy.builders.FilmeBuilder;
 import br.com.udemy.builders.UsuarioBuilder;
