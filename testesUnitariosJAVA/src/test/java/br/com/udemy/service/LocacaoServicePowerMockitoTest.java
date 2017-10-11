@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hamcrest.CoreMatchers;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -71,6 +72,14 @@ public class LocacaoServicePowerMockitoTest {
 		filmes = new ArrayList<>();
 		MockitoAnnotations.initMocks(this);
 		service = PowerMockito.spy(service);
+		
+		System.out.println("Inicializando 4");
+		CalculadoraTest.ordem.append("4");
+	}
+	
+	@AfterClass
+	public static void tearDownClass() {
+		System.out.println(CalculadoraTest.ordem);
 	}
 	
 	@Test

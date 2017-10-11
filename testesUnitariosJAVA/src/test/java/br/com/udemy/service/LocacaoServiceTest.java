@@ -20,6 +20,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -36,8 +37,10 @@ import br.com.udemy.matchers.MatchersProprios;
 import br.com.udemy.model.Filme;
 import br.com.udemy.model.Locacao;
 import br.com.udemy.model.Usuario;
-import buildermaster.BuilderMaster;
+import br.com.udemy.runners.ParallelRunner;
+//import buildermaster.BuilderMaster;
 
+@RunWith(ParallelRunner.class)
 public class LocacaoServiceTest {
 
 	@Rule
@@ -68,6 +71,8 @@ public class LocacaoServiceTest {
 		
 		MockitoAnnotations.initMocks(this);
 		
+		System.out.println("Iniciando 2");
+		CalculadoraTest.ordem.append("2");
 		/*service = new LocacaoService();
 		dao = Mockito.mock(LocacaoDAO.class);
 		service.setLocacaoDAO(dao);
@@ -79,12 +84,12 @@ public class LocacaoServiceTest {
 	
 	@After
 	public void tearDown() {
-		//System.out.println("tearDown");
+		System.out.println("Finalizando 2");
 	}
 	
 	@AfterClass
 	public static void tearDownClass() {
-		//System.out.println("tearDown");
+		System.out.println(CalculadoraTest.ordem.toString());
 	}
 
 
@@ -265,9 +270,9 @@ public class LocacaoServiceTest {
 		Assert.assertTrue(retornoNaSegunda);
 	}
 	
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 		new BuilderMaster().gerarCodigoClasse(Locacao.class);
-	}
+	}*/
 	
 	@Test
 	public void naoDeveAlugarFilmeParaNegativadoSPC() throws Exception  {

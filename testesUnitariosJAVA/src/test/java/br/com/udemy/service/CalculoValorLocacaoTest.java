@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.hamcrest.CoreMatchers;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,12 +52,19 @@ public class CalculoValorLocacaoTest {
 		usuario = UsuarioBuilder.umUsuario().agora();
 		
 		MockitoAnnotations.initMocks(this);
+		System.out.println("Inicializando 3");
+		CalculadoraTest.ordem.append("3");
 		//service = new LocacaoService();
 		//LocacaoDAO dao = new LocacaoDAOFake();
 		/*dao = Mockito.mock(LocacaoDAO.class);
 		service.setLocacaoDAO(dao);
 		spc = Mockito.mock(SPCService.class);
 		service.setSPCService(spc);*/
+	}
+	
+	@AfterClass
+	public static void tearDownClass() {
+		System.out.println(CalculadoraTest.ordem);
 	}
 	
 	private static Filme filme1 = new Filme("Filme 1", 2, 4.0);

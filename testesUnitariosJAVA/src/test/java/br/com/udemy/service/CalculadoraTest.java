@@ -1,26 +1,45 @@
 package br.com.udemy.service;
 
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import br.com.udemy.exception.NaoPodeDividirPorZeroException;
+import br.com.udemy.runners.ParallelRunner;
 
+@RunWith(ParallelRunner.class)
 public class CalculadoraTest {
+	
+	public static StringBuffer ordem = new StringBuffer();
 	
 	private Calculadora calc;
 	
 	@Before
 	public void setup() {
 		 calc = new Calculadora();
+		 System.out.println("inicializando...");
+		 ordem.append("1");
+	}
+	
+	@After
+	public void tearDown() {
+		 System.out.println("finalizando...");
+	}
+	
+	@AfterClass
+	public static void tearDownClass() {
+		System.out.println(ordem.toString());
 	}
 	
 	@Test
-	public void deveSomarDoisValores() {
+	public void deveSomarDoisValores() throws InterruptedException {
 		//cenario
 		int a = 5;
 		int b = 3;
-		
+		Thread.sleep(1000);
 		//acao
 		int resultado = calc.somar(a, b);
 		
